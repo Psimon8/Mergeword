@@ -34,15 +34,15 @@ def main():
 
             st.write("Sélectionnez les attributs à combiner :")
             selected_attributes = []
-            for i, col in enumerate(df.columns):
-                selected_attributes.append(st.selectbox(f"Attribut {i+1}", df.columns, index=i))
 
-            if st.button("Ajouter un attribut"):
-                selected_attributes.append(st.selectbox(f"Attribut {len(selected_attributes)+1}", df.columns, index=0))
+            num_attributes = st.number_input('Nombre d\'attributs à sélectionner', min_value=1, max_value=len(df.columns), value=1)
+            for i in range(num_attributes):
+                selected_attributes.append(st.selectbox(f"Attribut {i+1}", df.columns))
 
             st.write("### Attributs sélectionnés :")
+            cols = st.columns(len(selected_attributes))
             for i, attr in enumerate(selected_attributes):
-                st.write(f"Attribut {i+1}: {attr}")
+                cols[i].write(f"Attribut {i+1}: {attr}")
 
             if st.button("Générer les combinaisons"):
                 combinations = generate_combinations(selected_attributes, df)
