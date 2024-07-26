@@ -4,7 +4,11 @@ from itertools import product
 import pyperclip
 
 def load_excel(file):
-    return pd.read_excel(file)
+    try:
+        return pd.read_excel(file)
+    except Exception as e:
+        st.error(f"Erreur lors du chargement du fichier Excel: {e}")
+        return None
 
 def display_data(df):
     st.dataframe(df)
@@ -20,26 +24,27 @@ def main():
     
     if uploaded_file is not None:
         df = load_excel(uploaded_file)
-        display_data(df)
+        if df is not None:
+            display_data(df)
 
-        selected_attributes = []
-        st.write("Sélectionnez les attributs à combiner :")
-        for i, col in enumerate(df.columns):
-            selected_attributes.append(st.selectbox(f"Attribut {i+1}", df.columns, index=i))
+            selected_attributes = []
+            st.write("Sélectionnez les attributs à combiner :")
+            for i, col in enumerate(df.columns):
+                selected_attributes.append(st.selectbox(f"Attribut {i+1}", df.columns, index=i))
 
-        if st.button("Ajouter un attribut"):
-            selected_attributes.append(st.selectbox(f"Attribut {len(selected_attributes)+1}", df.columns, index=0))
+            if st.button("Ajouter un attribut"):
+                selected_attributes.append(st.selectbox(f"Attribut {len(selected_attributes)+1}", df.columns, index=0))
 
-        if selected_attributes:
-            combinations = generate_combinations(selected_attributes, df)
-            st.write("Combinaisons générées :")
-            for combination in combinations:
-                st.write(" ".join(combination))
+            if selected_attributes:
+                combinations = generate_combinations(selected_attributes, df)
+                st.write("Combinaisons générées :")
+                for combination in combinations:
+                    st.write(" ".join(combination))
 
-            if st.button("Copier les combinaisons dans le presse-papier"):
-                combinations_str = "\n".join([" ".join(comb) for comb in combinations])
-                pyperclip.copy(combinations_str)
-                st.success("Les combinaisons ont été copiées dans le presse-papier.")
+                if st.button("Copier les combinaisons dans le presse-papier"):
+                    combinations_str = "\n".join([" ".join(comb) for comb in combinations])
+                    pyperclip.copy(combinations_str)
+                    st.success("Les combinaisons ont été copiées dans le presse-papier.")
 
 if __name__ == "__main__":
     main()
