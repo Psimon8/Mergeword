@@ -1,5 +1,9 @@
+import streamlit as st
+import pandas as pd
+from itertools import product
+import pyperclip
+
 def load_excel(file):
-    st.write("Chargement du fichier Excel...")
     try:
         df = pd.read_excel(file)
         st.write("Fichier Excel chargé avec succès.")
@@ -9,23 +13,25 @@ def load_excel(file):
         return None
 
 def display_data(df):
-    st.write("Affichage des données...")
     st.dataframe(df)
 
 def generate_combinations(selected_attributes, data):
-    st.write("Génération des combinaisons...")
-    attribute_values = [data[attr].dropna().tolist() for attr in selected_attributes]
-    combinations = list(product(*attribute_values))
-    st.write("Combinaisons générées avec succès.")
-    return combinations
+    try:
+        attribute_values = [data[attr].dropna().tolist() for attr in selected_attributes]
+        combinations = list(product(*attribute_values))
+        return combinations
+    except Exception as e:
+        st.error(f"Erreur lors de la génération des combinaisons: {e}")
+        return []
 
 def main():
-    st.write("Démarrage de l'application...")
     st.title("Générateur de combinaisons d'attributs")
+    st.write("Démarrage de l'application...")
 
     uploaded_file = st.file_uploader("Importer un fichier Excel", type=["xls", "xlsx"])
     
     if uploaded_file is not None:
+        st.write("Fichier téléchargé.")
         df = load_excel(uploaded_file)
         if df is not None:
             display_data(df)
