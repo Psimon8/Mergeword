@@ -3,13 +3,11 @@ import pandas as pd
 from itertools import product
 import pyperclip
 
-
 st.set_page_config(
     layout="wide",
     page_title="Merge Word",
     page_icon="🌶"
 )
-
 
 def load_excel(file):
     try:
@@ -51,26 +49,28 @@ def main():
             display_data(df)
 
             if 'combinations' not in st.session_state:
-                st.session_state['combinations'] = [[]]
+                st.session_state['combinations'] = [[''] * 2]
 
             if st.button("Ajouter une combinaison"):
-                st.session_state['combinations'].append([])
+                st.session_state['combinations'].append([''] * 2)
 
             for i, combination in enumerate(st.session_state['combinations']):
                 st.write(f"### Combinaison {i + 1}")
-                cols = st.columns(len(combination) + 2)
-                for j, attr in enumerate(combination):
+                cols = st.columns(6)
+                for j in range(5):  # Toujours afficher 5 colonnes pour les attributs
                     with cols[j]:
-                        st.selectbox(f"Attribut {j + 1}", df.columns, index=df.columns.get_loc(attr) if attr in df.columns else 0, key=f"comb_{i}_attr_{j}")
-                        if st.button("Supprimer cet attribut", key=f"del_attr_{i}_{j}"):
-                            st.session_state['combinations'][i].pop(j)
-                            st.experimental_rerun()
-                with cols[-2]:
-                    st.title("")
-                    if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
-                        combination.append(df.columns[0])
-                with cols[-1]:
-                    st.title("")
+                        if j < len(combination):
+                            st.selectbox(f"Attribut {j + 1}", df.columns, index=df.columns.get_loc(combination[j]) if combination[j] in df.columns else 0, key=f"comb_{i}_attr_{j}")
+                            if st.button("Supprimer cet attribut", key=f"del_attr_{i}_{j}"):
+                                st.session_state['combinations'][i].pop(j)
+                                st.experimental_rerun()
+                        else:
+                            st.write("")  # Placeholder pour aligner les colonnes
+                with cols[5]:
+                    if len(combination) < 5:
+                        if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
+                            st.session_state['combinations'][i].append(df.columns[0])
+                    st.write("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
                         st.session_state['combinations'].pop(i)
                         st.experimental_rerun()
