@@ -3,7 +3,6 @@ import pandas as pd
 from itertools import product
 import pyperclip
 import sqlite3
-from tqdm import tqdm  # Bibliothèque pour afficher une barre de progression
 
 st.set_page_config(
     layout="wide",
@@ -37,17 +36,19 @@ def load_excel(file):
 def display_data(df):
     st.dataframe(df)
 
-# Utiliser tqdm.tqdm.external_write_mode() pour afficher la barre de progression
-tqdm.tqdm.external_write_mode()
-
 @st.cache_data  # Cache le résultat pour accélérer les calculs futurs
 def generate_combinations(combinations, data):
     all_combinations = []
-    for selected_attributes in tqdm(combinations, desc="Génération des combinaisons"):
+    total = len(combinations)
+    progress_bar = st.progress(0)
+
+    for i, selected_attributes in enumerate(combinations):
         attribute_values = [data[attr].dropna().tolist() for attr in selected_attributes if attr in data.columns]
         if attribute_values:
             combs = list(product(*attribute_values))
             all_combinations.extend(combs)
+        progress_bar.progress((i + 1) / total)
+
     return all_combinations
 
 def filter_combinations(combinations):
