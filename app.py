@@ -23,6 +23,13 @@ def generate_combinations(combinations, data):
         all_combinations.extend(combs)
     return all_combinations
 
+def filter_combinations(combinations):
+    filtered_combinations = []
+    for comb in combinations:
+        if len(set(comb)) == len(comb):  # Vérifie qu'il n'y a pas de valeurs dupliquées dans la combinaison
+            filtered_combinations.append(comb)
+    return filtered_combinations
+
 def main():
     st.title("Générateur de combinaisons d'attributs")
     st.write("Démarrage de l'application...")
@@ -60,12 +67,13 @@ def main():
 
             if st.button("Générer les combinaisons"):
                 combinations = generate_combinations(st.session_state['combinations'], df)
+                filtered_combinations = filter_combinations(combinations)
                 st.write("### Combinaisons générées :")
-                for combination in combinations:
+                for combination in filtered_combinations:
                     st.write(" ".join(combination))
 
                 if st.button("Copier les combinaisons dans le presse-papier"):
-                    combinations_str = "\n".join([" ".join(comb) for comb in combinations])
+                    combinations_str = "\n".join([" ".join(comb) for comb in filtered_combinations])
                     pyperclip.copy(combinations_str)
                     st.success("Les combinaisons ont été copiées dans le presse-papier.")
 
