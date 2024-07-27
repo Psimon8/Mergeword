@@ -58,6 +58,7 @@ def main():
                             st.session_state['combinations'][i].pop(j)
                             st.experimental_rerun()
                 with cols[-2]:
+                    st.title("")
                     if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
                         combination.append(df.columns[0])
                 with cols[-1]:
