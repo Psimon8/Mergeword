@@ -51,7 +51,7 @@ def main():
             if 'combinations' not in st.session_state:
                 st.session_state['combinations'] = [[''] * 2]
 
-            if st.button("Ajouter une combinaison"):
+            if st.button("Ajouter une combinaison", key="add_comb"):
                 st.session_state['combinations'].append([''] * 2)
 
             for i, combination in enumerate(st.session_state['combinations']):
@@ -76,17 +76,14 @@ def main():
                         st.experimental_rerun()
 
             st.write("### Actions")
-            st.button("Ajouter une combinaison")
-            st.button("Générer les combinaisons")
-
-            if st.button("Générer les combinaisons"):
+            if st.button("Générer les combinaisons", key="gen_combinations"):
                 combinations = generate_combinations(st.session_state['combinations'], df)
                 filtered_combinations = filter_combinations(combinations)
                 st.write("### Combinaisons générées :")
                 for combination in filtered_combinations:
                     st.write(" ".join(combination))
 
-                if st.button("Copier les combinaisons dans le presse-papier"):
+                if st.button("Copier les combinaisons dans le presse-papier", key="copy_combinations"):
                     combinations_str = "\n".join([" ".join(comb) for comb in filtered_combinations])
                     pyperclip.copy(combinations_str)
                     st.success("Les combinaisons ont été copiées dans le presse-papier.")
