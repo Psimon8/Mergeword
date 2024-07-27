@@ -52,27 +52,33 @@ def main():
             if 'combinations' not in st.session_state:
                 st.session_state['combinations'] = [[df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]]]
 
+            remove_comb = None
             for i, combination in enumerate(st.session_state['combinations']):
                 st.write(f"### Combinaison {i + 1}")
                 cols = st.columns(6)
+                remove_attr = None
                 for j in range(5):  # Toujours afficher 5 colonnes pour les attributs
                     with cols[j]:
                         if j < len(combination):
                             selected_attr = st.selectbox(f"Attribut {j + 1}", df.columns, index=df.columns.get_loc(combination[j]) if combination[j] in df.columns else 0, key=f"comb_{i}_attr_{j}")
                             st.session_state['combinations'][i][j] = selected_attr
                             if st.button("Supprimer cet attribut", key=f"del_attr_{i}_{j}"):
-                                st.session_state['combinations'][i].pop(j)
-                                st.experimental_rerun()
+                                remove_attr = j
                         else:
                             st.write("")  # Placeholder pour aligner les colonnes
+                if remove_attr is not None:
+                    st.session_state['combinations'][i].pop(remove_attr)
+                    st.experimental_rerun()
                 with cols[5]:
                     if len(combination) < 5:
                         if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
                             st.session_state['combinations'][i].append(df.columns[0])
                     st.write("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
-                        st.session_state['combinations'].pop(i)
-                        st.experimental_rerun()
+                        remove_comb = i
+            if remove_comb is not None:
+                st.session_state['combinations'].pop(remove_comb)
+                st.experimental_rerun()
 
             st.write("### Actions")
             if st.button("Ajouter une combinaison", key="add_comb"):
