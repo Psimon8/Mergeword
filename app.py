@@ -76,6 +76,9 @@ def main():
                         st.experimental_rerun()
 
             st.write("### Actions")
+            if st.button("Ajouter une combinaison", key="add_comb"):
+                st.session_state['combinations'].append([''] * 2)
+
             if st.button("Générer les combinaisons", key="gen_combinations"):
                 combinations = generate_combinations(st.session_state['combinations'], df)
                 filtered_combinations = filter_combinations(combinations)
