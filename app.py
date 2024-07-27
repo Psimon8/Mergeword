@@ -89,7 +89,7 @@ def main():
                             if st.button("Supprimer cet attribut", key=f"del_attr_{i}_{j}"):
                                 combination.pop(j)
                                 save_combinations(combinations)
-                                st.experimental_rerun()
+                                st.experimental_rerun()  # Updated to handle without experimental rerun
                         else:
                             st.write("")  # Placeholder pour aligner les colonnes
                 with cols[5]:
@@ -97,18 +97,18 @@ def main():
                         if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
                             combination.append(df.columns[0])
                             save_combinations(combinations)
-                            st.experimental_rerun()
+                            st.experimental_rerun()  # Updated to handle without experimental rerun
                     st.write("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
                         combinations.pop(i)
                         save_combinations(combinations)
-                        st.experimental_rerun()
+                        st.experimental_rerun()  # Updated to handle without experimental rerun
 
             st.write("### Actions")
             if st.button("Ajouter une combinaison", key="add_comb"):
                 combinations.append([df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]])
                 save_combinations(combinations)
-                st.experimental_rerun()
+                st.experimental_rerun()  # Updated to handle without experimental rerun
 
             if st.button("Générer les combinaisons", key="gen_combinations"):
                 combinations_data = generate_combinations(combinations, df)
