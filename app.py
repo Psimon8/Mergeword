@@ -52,7 +52,6 @@ def main():
             if 'combinations' not in st.session_state:
                 st.session_state['combinations'] = [[df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]]]
 
-            remove_comb = None
             for i, combination in enumerate(st.session_state['combinations']):
                 st.write(f"### Combinaison {i + 1}")
                 cols = st.columns(6)
@@ -75,9 +74,12 @@ def main():
                             st.session_state['combinations'][i].append(df.columns[0])
                     st.write("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
-                        remove_comb = i
-            if remove_comb is not None:
-                st.session_state['combinations'].pop(remove_comb)
+                        st.session_state['combinations_to_remove'] = i
+                        st.experimental_rerun()
+            
+            if 'combinations_to_remove' in st.session_state:
+                st.session_state['combinations'].pop(st.session_state['combinations_to_remove'])
+                del st.session_state['combinations_to_remove']
                 st.experimental_rerun()
 
             st.write("### Actions")
