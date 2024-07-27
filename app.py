@@ -75,6 +75,10 @@ def main():
                         st.session_state['combinations'].pop(i)
                         st.experimental_rerun()
 
+            st.write("### Actions")
+            st.button("Ajouter une combinaison")
+            st.button("Générer les combinaisons")
+
             if st.button("Générer les combinaisons"):
                 combinations = generate_combinations(st.session_state['combinations'], df)
                 filtered_combinations = filter_combinations(combinations)
