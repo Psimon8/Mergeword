@@ -73,6 +73,7 @@ def main():
                     if len(combination) < 5:
                         if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
                             st.session_state['combinations'][i].append(df.columns[0])
+                            st.experimental_set_query_params(**st.experimental_get_query_params())
                     st.write("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
                         st.session_state['combinations_to_remove'] = i
@@ -86,6 +87,7 @@ def main():
             st.write("### Actions")
             if st.button("Ajouter une combinaison", key="add_comb"):
                 st.session_state['combinations'].append([df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]])
+                st.experimental_set_query_params(**st.experimental_get_query_params())
 
             if st.button("Générer les combinaisons", key="gen_combinations"):
                 combinations = generate_combinations(st.session_state['combinations'], df)
