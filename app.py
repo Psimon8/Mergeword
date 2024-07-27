@@ -68,26 +68,26 @@ def main():
                             st.write("")  # Placeholder pour aligner les colonnes
                 if remove_attr is not None:
                     st.session_state['combinations'][i].pop(remove_attr)
-                    st.experimental_set_query_params(**st.experimental_get_query_params())
+                    st.set_query_params(**st.query_params)
                 with cols[5]:
                     if len(combination) < 5:
                         if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
                             st.session_state['combinations'][i].append(df.columns[0])
-                            st.experimental_set_query_params(**st.experimental_get_query_params())
+                            st.set_query_params(**st.query_params)
                     st.write("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
                         st.session_state['combinations_to_remove'] = i
-                        st.experimental_set_query_params(**st.experimental_get_query_params())
+                        st.set_query_params(**st.query_params)
             
             if 'combinations_to_remove' in st.session_state:
                 st.session_state['combinations'].pop(st.session_state['combinations_to_remove'])
                 del st.session_state['combinations_to_remove']
-                st.experimental_set_query_params(**st.experimental_get_query_params())
+                st.set_query_params(**st.query_params)
 
             st.write("### Actions")
             if st.button("Ajouter une combinaison", key="add_comb"):
                 st.session_state['combinations'].append([df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]])
-                st.experimental_set_query_params(**st.experimental_get_query_params())
+                st.set_query_params(**st.query_params)
 
             if st.button("Générer les combinaisons", key="gen_combinations"):
                 combinations = generate_combinations(st.session_state['combinations'], df)
