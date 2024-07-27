@@ -3,15 +3,6 @@ import pandas as pd
 from itertools import product
 import pyperclip
 
-
-st.set_page_config(
-    layout="wide",
-    page_title="Merge Keywords",
-    page_icon="🌶"
-)
-
-
-
 def load_excel(file):
     try:
         df = pd.read_excel(file)
@@ -24,10 +15,13 @@ def load_excel(file):
 def display_data(df):
     st.dataframe(df)
 
-def generate_combinations(selected_attributes, data):
-    attribute_values = [data[attr].dropna().tolist() for attr in selected_attributes]
-    combinations = list(product(*attribute_values))
-    return combinations
+def generate_combinations(combinations, data):
+    all_combinations = []
+    for selected_attributes in combinations:
+        attribute_values = [data[attr].dropna().tolist() for attr in selected_attributes]
+        combs = list(product(*attribute_values))
+        all_combinations.extend(combs)
+    return all_combinations
 
 def main():
     st.title("Générateur de combinaisons d'attributs")
@@ -41,20 +35,22 @@ def main():
         if df is not None:
             display_data(df)
 
-            st.write("Sélectionnez les attributs à combiner :")
-            selected_attributes = []
+            if 'combinations' not in st.session_state:
+                st.session_state['combinations'] = [[]]
 
-            num_attributes = st.number_input('Nombre d\'attributs à sélectionner', min_value=1, max_value=len(df.columns), value=1)
-            for i in range(num_attributes):
-                selected_attributes.append(st.selectbox(f"Attribut {i+1}", df.columns))
+            if st.button("Ajouter une combinaison"):
+                st.session_state['combinations'].append([])
 
-            st.write("### Attributs sélectionnés :")
-            cols = st.columns(len(selected_attributes))
-            for i, attr in enumerate(selected_attributes):
-                cols[i].write(f"Attribut {i+1}: {attr}")
+            for i, combination in enumerate(st.session_state['combinations']):
+                st.write(f"### Combinaison {i + 1}")
+                cols = st.columns(len(combination) + 1)
+                for j, attr in enumerate(combination):
+                    cols[j].selectbox(f"Attribut {j + 1}", df.columns, index=df.columns.get_loc(attr) if attr in df.columns else 0, key=f"comb_{i}_attr_{j}")
+                if cols[-1].button("Ajouter un attribut", key=f"add_attr_{i}"):
+                    combination.append(df.columns[0])
 
             if st.button("Générer les combinaisons"):
-                combinations = generate_combinations(selected_attributes, df)
+                combinations = generate_combinations(st.session_state['combinations'], df)
                 st.write("### Combinaisons générées :")
                 for combination in combinations:
                     st.write(" ".join(combination))
