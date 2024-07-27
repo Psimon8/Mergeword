@@ -3,6 +3,14 @@ import pandas as pd
 from itertools import product
 import pyperclip
 
+
+st.set_page_config(
+    layout="wide",
+    page_title="Merge Word",
+    page_icon="🌶"
+)
+
+
 def load_excel(file):
     try:
         df = pd.read_excel(file)
