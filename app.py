@@ -74,44 +74,42 @@ def main():
         if df is not None:
             display_data(df)
 
-            combinations = load_combinations()
-            if not combinations:
-                combinations = [[df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]]]
+            if 'combinations' not in st.session_state:
+                st.session_state['combinations'] = load_combinations()
+                if not st.session_state['combinations']:
+                    st.session_state['combinations'] = [[df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]]]
 
-            for i, combination in enumerate(combinations):
+            for i, combination in enumerate(st.session_state['combinations']):
                 st.write(f"### Combinaison {i + 1}")
                 cols = st.columns(6)
                 for j in range(5):  # Toujours afficher 5 colonnes pour les attributs
                     with cols[j]:
                         if j < len(combination):
                             selected_attr = st.selectbox(f"Attribut {j + 1}", df.columns, index=df.columns.get_loc(combination[j]) if combination[j] in df.columns else 0, key=f"comb_{i}_attr_{j}")
-                            combination[j] = selected_attr
+                            st.session_state['combinations'][i][j] = selected_attr
                             if st.button("Supprimer cet attribut", key=f"del_attr_{i}_{j}"):
-                                combination.pop(j)
-                                save_combinations(combinations)
+                                st.session_state['combinations'][i].pop(j)
+                                save_combinations(st.session_state['combinations'])
                                 st.experimental_rerun()
                         else:
                             st.write("")  # Placeholder pour aligner les colonnes
                 with cols[5]:
                     if len(combination) < 5:
                         if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
-                            combination.append(df.columns[0])
-                            save_combinations(combinations)
-                            st.experimental_rerun()
+                            st.session_state['combinations'][i].append(df.columns[0])
+                            save_combinations(st.session_state['combinations'])
                     st.write("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
-                        combinations.pop(i)
-                        save_combinations(combinations)
-                        st.experimental_rerun()
+                        st.session_state['combinations'].pop(i)
+                        save_combinations(st.session_state['combinations'])
 
             st.write("### Actions")
             if st.button("Ajouter une combinaison", key="add_comb"):
-                combinations.append([df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]])
-                save_combinations(combinations)
-                st.experimental_rerun()
+                st.session_state['combinations'].append([df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]])
+                save_combinations(st.session_state['combinations'])
 
             if st.button("Générer les combinaisons", key="gen_combinations"):
-                combinations_data = generate_combinations(combinations, df)
+                combinations_data = generate_combinations(st.session_state['combinations'], df)
                 filtered_combinations = filter_combinations(combinations_data)
                 st.write("### Combinaisons générées :")
                 if filtered_combinations:
