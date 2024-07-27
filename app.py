@@ -3,6 +3,7 @@ import pandas as pd
 from itertools import product
 import pyperclip
 import sqlite3
+from tqdm import tqdm  # Bibliothèque pour afficher une barre de progression
 
 st.set_page_config(
     layout="wide",
@@ -23,10 +24,11 @@ c.execute('''
 ''')
 conn.commit()
 
+@st.cache_data  # Cache le résultat pour accélérer les chargements futurs
 def load_excel(file):
     try:
         df = pd.read_excel(file)
-        st.write("Fichier Excel chargé avec succès.")
+        st.success("Fichier Excel chargé avec succès.")
         return df
     except Exception as e:
         st.error(f"Erreur lors du chargement du fichier Excel: {e}")
@@ -35,9 +37,10 @@ def load_excel(file):
 def display_data(df):
     st.dataframe(df)
 
+@st.cache_data  # Cache le résultat pour accélérer les calculs futurs
 def generate_combinations(combinations, data):
     all_combinations = []
-    for selected_attributes in combinations:
+    for selected_attributes in tqdm(combinations, desc="Génération des combinaisons"):
         attribute_values = [data[attr].dropna().tolist() for attr in selected_attributes if attr in data.columns]
         if attribute_values:
             combs = list(product(*attribute_values))
@@ -67,7 +70,7 @@ def main():
     st.write("Démarrage de l'application...")
 
     uploaded_file = st.file_uploader("Importer un fichier Excel", type=["xls", "xlsx"])
-    
+
     if uploaded_file is not None:
         st.write("Fichier téléchargé.")
         df = load_excel(uploaded_file)
@@ -107,14 +110,16 @@ def main():
                 save_combinations(st.session_state['combinations'])
 
             if st.button("Générer les combinaisons", key="gen_combinations"):
-                combinations_data = generate_combinations(st.session_state['combinations'], df)
-                filtered_combinations = filter_combinations(combinations_data)
+                with st.spinner("Génération des combinaisons en cours..."):  # Affiche une barre de progression pendant la génération
+                    combinations_data = generate_combinations(st.session_state['combinations'], df)
+                    filtered_combinations = filter_combinations(combinations_data)
+                st.success("Génération des combinaisons terminée.")
                 st.write("### Combinaisons générées :")
                 if filtered_combinations:
                     for combination in filtered_combinations:
                         st.write(" ".join(combination))
                 else:
-                    st.write("Aucune combinaison générée. Vérifiez que les attributs sont correctement sélectionnés.")
+                    st.warning("Aucune combinaison générée. Vérifiez que les attributs sont correctement sélectionnés.")
 
                 if st.button("Copier les combinaisons dans le presse-papier", key="copy_combinations"):
                     combinations_str = "\n".join([" ".join(comb) for comb in filtered_combinations])
