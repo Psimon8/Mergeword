@@ -37,6 +37,9 @@ def load_excel(file):
 def display_data(df):
     st.dataframe(df)
 
+# Utiliser tqdm.tqdm.external_write_mode() pour afficher la barre de progression
+tqdm.tqdm.external_write_mode()
+
 @st.cache_data  # Cache le résultat pour accélérer les calculs futurs
 def generate_combinations(combinations, data):
     all_combinations = []
