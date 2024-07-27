@@ -62,6 +62,9 @@ def save_combinations(combinations):
         c.execute('INSERT INTO combinations (combination) VALUES (?)', (str(comb),))
     conn.commit()
 
+def refresh_page():
+    raise st.script_runner.RerunException(st.script_request_queue.RerunData(None))
+
 def main():
     st.title("Générateur de combinaisons d'attributs")
     st.write("Démarrage de l'application...")
@@ -90,7 +93,7 @@ def main():
                             if st.button("Supprimer cet attribut", key=f"del_attr_{i}_{j}"):
                                 st.session_state['combinations'][i].pop(j)
                                 save_combinations(st.session_state['combinations'])
-                                st.experimental_rerun()
+                                refresh_page()
                         else:
                             st.write("")  # Placeholder pour aligner les colonnes
                 with cols[5]:
@@ -98,15 +101,18 @@ def main():
                         if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
                             st.session_state['combinations'][i].append(df.columns[0])
                             save_combinations(st.session_state['combinations'])
+                            refresh_page()
                     st.write("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
                         st.session_state['combinations'].pop(i)
                         save_combinations(st.session_state['combinations'])
+                        refresh_page()
 
             st.write("### Actions")
             if st.button("Ajouter une combinaison", key="add_comb"):
                 st.session_state['combinations'].append([df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]])
                 save_combinations(st.session_state['combinations'])
+                refresh_page()
 
             if st.button("Générer les combinaisons", key="gen_combinations"):
                 combinations_data = generate_combinations(st.session_state['combinations'], df)
