@@ -43,11 +43,20 @@ def main():
 
             for i, combination in enumerate(st.session_state['combinations']):
                 st.write(f"### Combinaison {i + 1}")
-                cols = st.columns(len(combination) + 1)
+                cols = st.columns(len(combination) + 2)
                 for j, attr in enumerate(combination):
-                    cols[j].selectbox(f"Attribut {j + 1}", df.columns, index=df.columns.get_loc(attr) if attr in df.columns else 0, key=f"comb_{i}_attr_{j}")
-                if cols[-1].button("Ajouter un attribut", key=f"add_attr_{i}"):
-                    combination.append(df.columns[0])
+                    with cols[j]:
+                        st.selectbox(f"Attribut {j + 1}", df.columns, index=df.columns.get_loc(attr) if attr in df.columns else 0, key=f"comb_{i}_attr_{j}")
+                        if st.button("Supprimer cet attribut", key=f"del_attr_{i}_{j}"):
+                            st.session_state['combinations'][i].pop(j)
+                            st.experimental_rerun()
+                with cols[-2]:
+                    if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
+                        combination.append(df.columns[0])
+                with cols[-1]:
+                    if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
+                        st.session_state['combinations'].pop(i)
+                        st.experimental_rerun()
 
             if st.button("Générer les combinaisons"):
                 combinations = generate_combinations(st.session_state['combinations'], df)
