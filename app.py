@@ -68,7 +68,7 @@ def main():
                             st.write("")  # Placeholder pour aligner les colonnes
                 if remove_attr is not None:
                     st.session_state['combinations'][i].pop(remove_attr)
-                    st.set_query_params(**st.query_params)
+                    st.experimental_set_query_params(**st.experimental_get_query_params())
                 with cols[5]:
                     if len(combination) < 5:
                         if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
@@ -76,12 +76,12 @@ def main():
                     st.write("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
                         st.session_state['combinations_to_remove'] = i
-                        st.set_query_params(**st.query_params)
+                        st.experimental_set_query_params(**st.experimental_get_query_params())
             
             if 'combinations_to_remove' in st.session_state:
                 st.session_state['combinations'].pop(st.session_state['combinations_to_remove'])
                 del st.session_state['combinations_to_remove']
-                st.set_query_params(**st.query_params)
+                st.experimental_set_query_params(**st.experimental_get_query_params())
 
             st.write("### Actions")
             if st.button("Ajouter une combinaison", key="add_comb"):
