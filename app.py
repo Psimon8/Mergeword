@@ -62,6 +62,7 @@ def main():
                     if st.button("Ajouter un attribut", key=f"add_attr_{i}"):
                         combination.append(df.columns[0])
                 with cols[-1]:
+                    st.title("")
                     if st.button("Supprimer cette combinaison", key=f"del_comb_{i}"):
                         st.session_state['combinations'].pop(i)
                         st.experimental_rerun()
