@@ -25,8 +25,9 @@ def generate_combinations(combinations, data):
     all_combinations = []
     for selected_attributes in combinations:
         attribute_values = [data[attr].dropna().tolist() for attr in selected_attributes if attr in data.columns]
-        combs = list(product(*attribute_values))
-        all_combinations.extend(combs)
+        if attribute_values:
+            combs = list(product(*attribute_values))
+            all_combinations.extend(combs)
     return all_combinations
 
 def filter_combinations(combinations):
@@ -57,7 +58,8 @@ def main():
                 for j in range(5):  # Toujours afficher 5 colonnes pour les attributs
                     with cols[j]:
                         if j < len(combination):
-                            st.selectbox(f"Attribut {j + 1}", df.columns, index=df.columns.get_loc(combination[j]) if combination[j] in df.columns else 0, key=f"comb_{i}_attr_{j}")
+                            selected_attr = st.selectbox(f"Attribut {j + 1}", df.columns, index=df.columns.get_loc(combination[j]) if combination[j] in df.columns else 0, key=f"comb_{i}_attr_{j}")
+                            st.session_state['combinations'][i][j] = selected_attr
                             if st.button("Supprimer cet attribut", key=f"del_attr_{i}_{j}"):
                                 st.session_state['combinations'][i].pop(j)
                                 st.experimental_rerun()
@@ -80,8 +82,11 @@ def main():
                 combinations = generate_combinations(st.session_state['combinations'], df)
                 filtered_combinations = filter_combinations(combinations)
                 st.write("### Combinaisons générées :")
-                for combination in filtered_combinations:
-                    st.write(" ".join(combination))
+                if filtered_combinations:
+                    for combination in filtered_combinations:
+                        st.write(" ".join(combination))
+                else:
+                    st.write("Aucune combinaison générée. Vérifiez que les attributs sont correctement sélectionnés.")
 
                 if st.button("Copier les combinaisons dans le presse-papier", key="copy_combinations"):
                     combinations_str = "\n".join([" ".join(comb) for comb in filtered_combinations])
