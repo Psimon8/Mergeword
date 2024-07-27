@@ -51,9 +51,6 @@ def main():
             if 'combinations' not in st.session_state:
                 st.session_state['combinations'] = [[''] * 2]
 
-            if st.button("Ajouter une combinaison", key="add_comb"):
-                st.session_state['combinations'].append([''] * 2)
-
             for i, combination in enumerate(st.session_state['combinations']):
                 st.write(f"### Combinaison {i + 1}")
                 cols = st.columns(6)
