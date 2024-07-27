@@ -24,7 +24,7 @@ def display_data(df):
 def generate_combinations(combinations, data):
     all_combinations = []
     for selected_attributes in combinations:
-        attribute_values = [data[attr].dropna().tolist() for attr in selected_attributes]
+        attribute_values = [data[attr].dropna().tolist() for attr in selected_attributes if attr in data.columns]
         combs = list(product(*attribute_values))
         all_combinations.extend(combs)
     return all_combinations
@@ -49,7 +49,7 @@ def main():
             display_data(df)
 
             if 'combinations' not in st.session_state:
-                st.session_state['combinations'] = [[''] * 2]
+                st.session_state['combinations'] = [[df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]]]
 
             for i, combination in enumerate(st.session_state['combinations']):
                 st.write(f"### Combinaison {i + 1}")
@@ -74,7 +74,7 @@ def main():
 
             st.write("### Actions")
             if st.button("Ajouter une combinaison", key="add_comb"):
-                st.session_state['combinations'].append([''] * 2)
+                st.session_state['combinations'].append([df.columns[0], df.columns[1]] if len(df.columns) > 1 else [df.columns[0]])
 
             if st.button("Générer les combinaisons", key="gen_combinations"):
                 combinations = generate_combinations(st.session_state['combinations'], df)
