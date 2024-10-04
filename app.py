@@ -11,10 +11,15 @@ def main():
     st.title("Merge Words Tool")
     st.write("Enter words in each box to create combinations. Useful for SEO, PPC, and link-building.")
 
-    # Input boxes for three lists
-    words1 = st.text_area("Enter words for List 1 (one per line)").splitlines()
-    words2 = st.text_area("Enter words for List 2 (one per line)").splitlines()
-    words3 = st.text_area("Enter words for List 3 (one per line)").splitlines()
+    # Create three columns for the input lists
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        words1 = st.text_area("List 1", placeholder="Enter words here, one per line").splitlines()
+    with col2:
+        words2 = st.text_area("List 2", placeholder="Enter words here, one per line").splitlines()
+    with col3:
+        words3 = st.text_area("List 3", placeholder="Enter words here, one per line").splitlines()
 
     # Separator options
     separator_option = st.selectbox("Choose a separator", ["None", "Space", "Hyphen", "Plus", "Custom"])
