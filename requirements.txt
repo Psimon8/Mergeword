@@ -3,3 +3,6 @@ pandas
 pyperclip
 openpyxl
 tqdm
+streamlit
+pandas
+xlsxwriter
