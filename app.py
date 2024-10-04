@@ -2,91 +2,57 @@
 
 import streamlit as st
 from itertools import product
-import pandas as pd
-from io import BytesIO
+import pyperclip
 
-# Function to merge words from dynamic lists with spaces
-def merge_words(lists):
-    return [" ".join(words) for words in product(*lists)]
-
-# Function to create a downloadable Excel file
-def create_excel_download(data):
-    output = BytesIO()
-    df = pd.DataFrame(data, columns=["Combination"])
-    with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-        df.to_excel(writer, index=False)
-    return output.getvalue()
+def merge_words(list1, list2, list3=None):
+    if list3:
+        merged = [f"{a} {b} {c}" for a, b, c in product(list1, list2, list3)]
+    else:
+        merged = [f"{a} {b}" for a, b in product(list1, list2)]
+    return merged
 
 def main():
-    st.title("Merge Words Tool with Dynamic Columns")
-    st.write("Enter words in each box to create combinations with spaces as separators.")
+    st.title("Merge Words Tool")
+    st.write("Enter words in the lists below to create combinations with spaces as separators.")
 
-    # Dynamic list to store text inputs for each column
-    input_lists = []
+    # Create three columns for the input lists
+    col1, col2, col3 = st.columns(3)
 
-    # Initial columns setup
-    num_columns = st.session_state.get('num_columns', 3)
-    
-    for i in range(num_columns):
-        input_list = st.text_area(f"List {i+1}", placeholder="Enter words here, one per line").splitlines()
-        input_lists.append(input_list)
-    
-    # Add new column button
-    if st.button("Add Another List"):
-        st.session_state.num_columns = num_columns + 1
+    with col1:
+        words1 = st.text_area("List 1", placeholder="Enter words here, one per line").splitlines()
+    with col2:
+        words2 = st.text_area("List 2", placeholder="Enter words here, one per line").splitlines()
+    with col3:
+        words3 = st.text_area("List 3 (optional)", placeholder="Enter words here, one per line").splitlines()
+
+    # Determine if the third list is used
+    if not words3:
+        words3 = None
 
     # Calculate the estimated number of combinations
-    estimated_combinations = 1
-    for lst in input_lists:
-        estimated_combinations *= len(lst) or 1  # Handle empty lists
-
+    estimated_combinations = len(words1) * len(words2) * (len(words3) if words3 else 1)
     st.write(f"Estimated combinations: {estimated_combinations}")
 
-    # Initialize list for storing results
+    # Buttons for merging and copying to clipboard
+    copy_button, merge_button = st.columns([1, 3])
     generated_combinations = []
-    output_text = ""
-    
-    # Buttons for merging, copying to clipboard, and downloading
-    copy_button, merge_button, download_button = st.columns([1, 2, 1])
 
-    # Merge button functionality
     if merge_button.button("Merge"):
-        if any(len(lst) == 0 for lst in input_lists[:2]):  # Require at least two lists with entries
+        if not all([words1, words2]):
             st.warning("Please enter words in at least List 1 and List 2.")
         else:
-            generated_combinations = merge_words(input_lists)
-            output_text = "\n".join(generated_combinations)
+            generated_combinations = merge_words(words1, words2, words3)
             st.write("Generated combinations:")
 
     # Display generated combinations as text output
+    output_text = "\n".join(generated_combinations)
     st.text_area("Merged Combinations", value=output_text, height=200)
 
-    # Copy to clipboard using JavaScript
-    if generated_combinations:
-        st.markdown("""
-            <button onclick="copyToClipboard()">Copy to Clipboard</button>
-            <script>
-            function copyToClipboard() {
-                var textArea = document.createElement("textarea");
-                textArea.value = `""" + output_text + """`;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand("copy");
-                document.body.removeChild(textArea);
-                alert("Copied to clipboard!");
-            }
-            </script>
-            """, unsafe_allow_html=True)
-
-    # Download as XLSX functionality
-    if generated_combinations:
-        excel_data = create_excel_download([(combo,) for combo in generated_combinations])
-        download_button.download_button(
-            label="Download as XLSX",
-            data=excel_data,
-            file_name="merged_combinations.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+    # Copy to clipboard functionality
+    if copy_button.button("Copy to Clipboard"):
+        if generated_combinations:
+            pyperclip.copy(output_text)
+            st.success("Combinations copied to clipboard!")
 
 if __name__ == "__main__":
     main()
